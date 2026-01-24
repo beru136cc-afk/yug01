@@ -12,32 +12,31 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/gymFragment"
-        android:name="com.example.yugved4.fragments.GymFragment"
-        android:label="Gym"
-        tools:layout="@layout/fragment_gym">
+        android:id="@+id/workoutFragment"
+        android:name="com.example.yugved4.fragments.WorkoutFragment"
+        android:label="Workout"
+        tools:layout="@layout/fragment_workout">
         
         <action
-            android:id="@+id/action_gymFragment_to_exerciseListFragment"
+            android:id="@+id/action_workoutFragment_to_exerciseListFragment"
             app:destination="@id/exerciseListFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/yogaFragment"
-        android:name="com.example.yugved4.fragments.YogaFragment"
-        android:label="Yoga"
-        tools:layout="@layout/fragment_yoga">
-        
+            
         <action
-            android:id="@+id/action_yogaFragment_to_asanaListFragment"
+            android:id="@+id/action_workoutFragment_to_asanaListFragment"
             app:destination="@id/asanaListFragment" />
     </fragment>
+
 
     <fragment
         android:id="@+id/dietFragment"
         android:name="com.example.yugved4.fragments.DietFragment"
         android:label="Diet"
-        tools:layout="@layout/fragment_diet" />
+        tools:layout="@layout/fragment_diet_survey">
+        
+        <action
+            android:id="@+id/action_dietFragment_to_dietResultFragment"
+            app:destination="@id/dietResultFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/mentalHealthFragment"
@@ -50,6 +49,12 @@
         android:name="com.example.yugved4.fragments.DoctorFragment"
         android:label="Doctor"
         tools:layout="@layout/fragment_doctor" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.yugved4.fragments.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
 
     <!-- Exercise List Fragment -->
     <fragment
@@ -90,5 +95,12 @@
             android:name="asanaId"
             app:argType="string" />
     </fragment>
+
+    <!-- Diet Result Fragment -->
+    <fragment
+        android:id="@+id/dietResultFragment"
+        android:name="com.example.yugved4.fragments.DietResultFragment"
+        android:label="Diet Results"
+        tools:layout="@layout/fragment_diet_result" />
 
 </navigation>

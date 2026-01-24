@@ -58,11 +58,14 @@ class GymFragment : Fragment() {
      */
     private fun setupRecyclerView() {
         categoryAdapter = CategoryAdapter(categories) { category ->
+            // NOTE: GymFragment is deprecated - use WorkoutFragment instead
+            // This fragment kept for reference but navigation removed
             // Navigate to ExerciseListFragment with category name using Bundle
             val bundle = Bundle().apply {
                 putString("categoryName", category.name)
             }
-            findNavController().navigate(R.id.action_gymFragment_to_exerciseListFragment, bundle)
+            // TODO: This navigation no longer works - GymFragment removed from nav_graph
+            // findNavController().navigate(R.id.action_gymFragment_to_exerciseListFragment, bundle)
         }
 
         binding.rvCategories.apply {

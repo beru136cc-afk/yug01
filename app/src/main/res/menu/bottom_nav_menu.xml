@@ -6,19 +6,19 @@
         android:title="Home" />
 
     <item
-        android:id="@+id/gymFragment"
+        android:id="@+id/workoutFragment"
         android:icon="@drawable/ic_activity"
-        android:title="Gym" />
-
-    <item
-        android:id="@+id/yogaFragment"
-        android:icon="@drawable/ic_activity"
-        android:title="Yoga" />
+        android:title="Workout" />
 
     <item
         android:id="@+id/dietFragment"
         android:icon="@drawable/ic_meals"
         android:title="Diet" />
+
+    <item
+        android:id="@+id/mentalHealthFragment"
+        android:icon="@drawable/ic_self_improvement"
+        android:title="Mind" />
 
     <item
         android:id="@+id/doctorFragment"

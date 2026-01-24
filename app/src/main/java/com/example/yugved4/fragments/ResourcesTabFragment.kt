@@ -8,15 +8,15 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yugved4.R
-import com.example.yugved4.adapters.HelplineCardAdapter
+import com.example.yugved4.adapters.MentalHealthResourceAdapter
 import com.example.yugved4.database.DatabaseHelper
 
 /**
- * Mental Health Fragment - Shows Daily Peace card and emergency helplines
+ * Resources Tab Fragment - Displays mental health resources from database
  */
-class MentalHealthFragment : Fragment() {
+class ResourcesTabFragment : Fragment() {
 
-    private lateinit var rvHelplines: RecyclerView
+    private lateinit var rvResources: RecyclerView
     private lateinit var dbHelper: DatabaseHelper
 
     override fun onCreateView(
@@ -24,32 +24,30 @@ class MentalHealthFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view = inflater.inflate(R.layout.fragment_mental_health, container, false)
+        val view = inflater.inflate(R.layout.tab_resources, container, false)
 
         // Initialize database helper
         dbHelper = DatabaseHelper(requireContext())
 
         // Initialize RecyclerView
-        rvHelplines = view.findViewById(R.id.rvHelplines)
+        rvResources = view.findViewById(R.id.rvResources)
         setupRecyclerView()
 
         return view
     }
 
     private fun setupRecyclerView() {
-        // Get all helplines from database
-        val helplines = dbHelper.getAllHelplines()
+        // Get all mental health content from database
+        val resources = dbHelper.getAllMentalHealthContent()
 
         // Create adapter
-        val adapter = HelplineCardAdapter(helplines)
+        val adapter = MentalHealthResourceAdapter(resources)
 
         // Setup RecyclerView
-        rvHelplines.apply {
+        rvResources.apply {
             layoutManager = LinearLayoutManager(requireContext())
             this.adapter = adapter
             setHasFixedSize(true)
         }
     }
 }
-
-

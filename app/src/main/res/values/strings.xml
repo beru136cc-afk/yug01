@@ -53,5 +53,88 @@
     <string name="step_1">1. Stand with your feet together, big toes touching, and heels slightly apart.</string>
     <string name="step_2">2. Distribute your weight evenly through the soles of your feet.</string>
     <string name="step_3">3. Engage your thigh muscles and lift your kneecaps. Keep your arms at your sides.</string>
+    
+    <!-- Diet Questionnaire Strings -->
+    <string name="step_1_of_3">Step 1 of 3</string>
+    <string name="step_2_of_3">Step 2 of 3</string>
+    <string name="step_3_of_3">Step 3 of 3</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
+    <string name="calculate">Calculate</string>
+    
+    <string name="activity_icon">Activity Icon</string>
+    <string name="activity_level_title">What\'s your activity level?</string>
+    <string name="activity_level_subtitle">This helps us calculate your daily calorie needs</string>
+    <string name="select_activity_level">Select Activity Level</string>
+    <string name="activity_level">Activity Level</string>
+    <string name="sedentary">Sedentary (little/no exercise)</string>
+    <string name="lightly_active">Lightly Active (1-3 days/week)</string>
+    <string name="moderately_active">Moderately Active (3-5 days/week)</string>
+    <string name="very_active">Very Active (6-7 days/week)</string>
+    <string name="extra_active">Extra Active (intense exercise daily)</string>
+    
+    <string name="diet_icon">Diet Icon</string>
+    <string name="diet_preference_title">Your dietary preference?</string>
+    <string name="diet_preference_subtitle">Tell us your food choices</string>
+    <string name="diet_preference">Diet Preference</string>
+    <string name="vegetarian">Vegetarian</string>
+    <string name="non_vegetarian">Non-Vegetarian</string>
+    
+    <string name="metrics_icon">Metrics Icon</string>
+    <string name="body_metrics_title">Tell us about yourself</string>
+    <string name="body_metrics_subtitle">We need these details for accurate calculations</string>
+    <string name="age_years">Age (years)</string>
+    <string name="gender">Gender</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="height_cm">Height (cm)</string>
+    <string name="height">Height</string>
+    <string name="weight_kg">Weight (kg)</string>
+    <string name="weight">Weight</string>
+    <string name="age_gender">Age &amp; Gender</string>
+    
+    <string name="success_icon">Success Icon</string>
+    <string name="your_daily_calorie_goal">Your Daily Calorie Goal</string>
+    <string name="calories_per_day">calories/day</string>
+    <string name="your_details">Your Details</string>
+    <string name="generate_meal_plan">Generate Meal Plan</string>
+    <string name="recalculate">Recalculate</string>
+    
+    <!-- Validation Messages -->
+    <string name="please_enter_age">Please enter your age</string>
+    <string name="please_select_gender">Please select your gender</string>
+    <string name="please_enter_height">Please enter your height</string>
+    <string name="please_enter_weight">Please enter your weight</string>
+    <string name="invalid_age">Please enter a valid age (10-120)</string>
+    <string name="invalid_height">Please enter a valid height (100-250 cm)</string>
+    <string name="invalid_weight">Please enter a valid weight (30-200 kg)</string>
+    
+    <!-- Doctor Directory Strings -->
+    <string name="my_doctors">My Doctors</string>
+    <string name="no_doctors_added">No doctors saved yet</string>
+    <string name="tap_plus_to_add">Tap + to add a doctor</string>
+    <string name="add_doctor">Add Doctor</string>
+    <string name="add_new_doctor">Add New Doctor</string>
+    <string name="doctor_name">Doctor Name</string>
+    <string name="doctor_icon">Doctor Icon</string>
+    <string name="phone_icon">Phone Icon</string>
+    <string name="no_doctors_icon">No Doctors Icon</string>
+    <string name="specialty">Specialty</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="call">Call</string>
+    <string name="whatsapp">WhatsApp</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="delete_doctor_confirm">Delete this doctor?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="please_enter_name">Please enter doctor\'s name</string>
+    <string name="please_enter_specialty">Please enter specialty</string>
+    <string name="please_enter_phone">Please enter phone number</string>
+    <string name="invalid_phone">Please enter a valid phone number</string>
+    <string name="doctor_added">Doctor added successfully</string>
+    <string name="doctor_deleted">Doctor deleted</string>
+    <string name="whatsapp_not_installed">WhatsApp is not installed</string>
 
 </resources>
