@@ -4,6 +4,9 @@
 
     <!-- Permission for making phone calls (ACTION_DIAL doesn't require it, but good to have) -->
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    
+    <!-- Permission for physical activity recognition (step counter) -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 
     <application
         android:name=".YugvedApplication"

@@ -3,13 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/stepFragment">
 
     <fragment
-        android:id="@+id/homeFragment"
-        android:name="com.example.yugved4.fragments.HomeFragment"
-        android:label="Home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/stepFragment"
+        android:name="com.example.yugved4.fragments.StepFragment"
+        android:label="Steps"
+        tools:layout="@layout/fragment_step" />
+
 
     <fragment
         android:id="@+id/workoutFragment"

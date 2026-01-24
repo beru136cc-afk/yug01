@@ -16,7 +16,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "yugved.db"
-        private const val DATABASE_VERSION = 8  // Incremented for meal_plans table
+        private const val DATABASE_VERSION = 9  // Incremented for step counter tables
         
         // Doctors table and columns
         private const val TABLE_DOCTORS = "doctors"
@@ -89,6 +89,16 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         private const val COLUMN_LUNCH = "lunch"
         private const val COLUMN_DINNER = "dinner"
         private const val COLUMN_SNACKS = "snacks"
+        
+        // App settings table and columns
+        private const val TABLE_APP_SETTINGS = "app_settings"
+        private const val COLUMN_SETTING_KEY = "key"
+        private const val COLUMN_SETTING_VALUE = "value"
+        
+        // Daily steps table and columns
+        private const val TABLE_DAILY_STEPS = "daily_steps"
+        private const val COLUMN_STEP_DATE = "date"
+        private const val COLUMN_STEP_COUNT = "step_count"
     }
 
     /**
@@ -216,6 +226,24 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         
         // Insert seed data for meal plans
         insertMealPlansSeedData(db)
+        
+        // Create app settings table
+        val createAppSettingsTable = """
+            CREATE TABLE $TABLE_APP_SETTINGS (
+                $COLUMN_SETTING_KEY TEXT PRIMARY KEY,
+                $COLUMN_SETTING_VALUE INTEGER NOT NULL
+            )
+        """.trimIndent()
+        db.execSQL(createAppSettingsTable)
+        
+        // Create daily steps table
+        val createDailyStepsTable = """
+            CREATE TABLE $TABLE_DAILY_STEPS (
+                $COLUMN_STEP_DATE TEXT PRIMARY KEY,
+                $COLUMN_STEP_COUNT INTEGER NOT NULL
+            )
+        """.trimIndent()
+        db.execSQL(createDailyStepsTable)
     }
 
     /**
@@ -230,6 +258,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         db.execSQL("DROP TABLE IF EXISTS $TABLE_GYM_EXERCISES")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_YOGA_ASANAS")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_MEAL_PLANS")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_APP_SETTINGS")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_DAILY_STEPS")
         onCreate(db)
     }
 
@@ -1633,4 +1663,99 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val description: String,
         val thumbnailResource: Int
     )
+    
+    // =====================================================
+    // STEP COUNTER SETTINGS METHODS
+    // =====================================================
+    
+    /**
+     * Set step counter enabled/disabled state
+     * @param isEnabled True to enable step tracking, false to disable
+     */
+    fun setStepCounterEnabled(isEnabled: Boolean) {
+        val db = writableDatabase
+        val value = if (isEnabled) 1 else 0
+        
+        // Use INSERT OR REPLACE to update existing or insert new
+        db.execSQL(
+            "INSERT OR REPLACE INTO $TABLE_APP_SETTINGS ($COLUMN_SETTING_KEY, $COLUMN_SETTING_VALUE) VALUES (?, ?)",
+            arrayOf("step_counter_enabled", value)
+        )
+        
+        db.close()
+    }
+    
+    /**
+     * Get step counter enabled/disabled state
+     * @return True if step tracking is enabled, false otherwise
+     */
+    fun getStepCounterEnabled(): Boolean {
+        val db = readableDatabase
+        var isEnabled = false
+        
+        db.rawQuery(
+            "SELECT $COLUMN_SETTING_VALUE FROM $TABLE_APP_SETTINGS WHERE $COLUMN_SETTING_KEY = ?",
+            arrayOf("step_counter_enabled")
+        ).use { cursor ->
+            if (cursor.moveToFirst()) {
+                isEnabled = cursor.getInt(0) == 1
+            }
+        }
+        
+        db.close()
+        return isEnabled
+    }
+    
+    // =====================================================
+    // DAILY STEP TRACKING METHODS
+    // =====================================================
+    
+    /**
+     * Save step count for a specific date
+     * @param date Date in format "YYYY-MM-DD"
+     * @param stepCount Number of steps
+     */
+    fun saveStepCount(date: String, stepCount: Int) {
+        val db = writableDatabase
+        
+        // Use INSERT OR REPLACE to update existing or insert new
+        db.execSQL(
+            "INSERT OR REPLACE INTO $TABLE_DAILY_STEPS ($COLUMN_STEP_DATE, $COLUMN_STEP_COUNT) VALUES (?, ?)",
+            arrayOf(date, stepCount)
+        )
+        
+        db.close()
+    }
+    
+    /**
+     * Get step count for a specific date
+     * @param date Date in format "YYYY-MM-DD"
+     * @return Step count or 0 if no data found
+     */
+    fun getStepCount(date: String): Int {
+        val db = readableDatabase
+        var stepCount = 0
+        
+        db.rawQuery(
+            "SELECT $COLUMN_STEP_COUNT FROM $TABLE_DAILY_STEPS WHERE $COLUMN_STEP_DATE = ?",
+            arrayOf(date)
+        ).use { cursor ->
+            if (cursor.moveToFirst()) {
+                stepCount = cursor.getInt(0)
+            }
+        }
+        
+        db.close()
+        return stepCount
+    }
+    
+    /**
+     * Get step count for today
+     * @return Step count or 0 if no data found
+     */
+    fun getTodayStepCount(): Int {
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+            .format(java.util.Date())
+        return getStepCount(today)
+    }
 }
