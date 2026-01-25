@@ -62,8 +62,39 @@ class OnboardingActivity : AppCompatActivity() {
             }
         }
 
-        // Show first step
-        updateUI()
+        // Check for existing cloud profile before showing onboarding
+        checkForCloudProfile()
+    }
+    
+    /**
+     * Check if user has existing profile in Firestore
+     * If found, load it and skip onboarding
+     */
+    private fun checkForCloudProfile() {
+        lifecycleScope.launch {
+            try {
+                val hasProfile = dbHelper.loadProfileFromCloud()
+                if (hasProfile) {
+                    // Profile restored from cloud - skip onboarding
+                    Toast.makeText(
+                        this@OnboardingActivity,
+                        "Welcome back! Your profile has been restored.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    
+                    // Navigate to main app
+                    startActivity(Intent(this@OnboardingActivity, MainActivity::class.java))
+                    finish()
+                } else {
+                    // No cloud profile - show first step
+                    updateUI()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // Error loading from cloud - proceed with onboarding
+                updateUI()
+            }
+        }
     }
 
     private fun updateUI() {

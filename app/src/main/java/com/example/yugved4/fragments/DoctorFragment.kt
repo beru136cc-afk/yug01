@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.yugved4.R
@@ -18,6 +19,7 @@ import com.example.yugved4.database.DatabaseHelper
 import com.example.yugved4.models.Doctor
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.launch
 
 /**
  * Doctor Fragment - Manage doctor directory with SQLite Database
@@ -74,6 +76,39 @@ class DoctorFragment : Fragment() {
     private fun loadDoctors() {
         doctors.clear()
         doctors.addAll(dbHelper.getAllDoctors())
+        
+        // If local database is empty, try loading from Firestore
+        if (doctors.isEmpty()) {
+            loadDoctorsFromCloud()
+        }
+    }
+    
+    /**
+     * Load doctors from Firestore cloud storage
+     * Called when local database is empty (e.g., after app reinstall)
+     */
+    private fun loadDoctorsFromCloud() {
+        lifecycleScope.launch {
+            try {
+                val count = dbHelper.loadDoctorsFromCloud()
+                if (count > 0) {
+                    // Reload from local database
+                    doctors.clear()
+                    doctors.addAll(dbHelper.getAllDoctors())
+                    doctorAdapter.notifyDataSetChanged()
+                    updateEmptyState()
+                    
+                    Toast.makeText(
+                        requireContext(),
+                        "$count doctor(s) restored from cloud",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // Silently fail - user will see empty state
+            }
+        }
     }
 
     private fun setupFAB() {

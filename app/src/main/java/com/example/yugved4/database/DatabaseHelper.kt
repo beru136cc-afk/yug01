@@ -7,12 +7,17 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.yugved4.models.Doctor
 import com.example.yugved4.models.UserProfile
+import com.example.yugved4.utils.AuthHelper
+import com.example.yugved4.utils.FirestoreHelper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * SQLiteOpenHelper for Doctor Database
  * Uses raw SQL statements for database operations
  */
-class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
         private const val DATABASE_NAME = "yugved.db"
@@ -280,6 +285,24 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         
         val id = db.insert(TABLE_DOCTORS, null, values)
         db.close()
+        
+        // Sync to Firestore in background
+        if (id != -1L) {
+            val doctor = Doctor(
+                id = id.toString(),
+                name = name,
+                specialty = specialty,
+                phoneNumber = phone,
+                email = email
+            )
+            val uid = AuthHelper.getCurrentUser()?.uid
+            if (uid != null) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    FirestoreHelper.syncDoctorToFirestore(uid, doctor)
+                }
+            }
+        }
+        
         return id
     }
 
@@ -331,6 +354,24 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         
         val rowsAffected = db.update(TABLE_DOCTORS, values, "$COLUMN_ID = ?", arrayOf(id))
         db.close()
+        
+        // Sync to Firestore in background
+        if (rowsAffected > 0) {
+            val doctor = Doctor(
+                id = id,
+                name = name,
+                specialty = specialty,
+                phoneNumber = phone,
+                email = email
+            )
+            val uid = AuthHelper.getCurrentUser()?.uid
+            if (uid != null) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    FirestoreHelper.syncDoctorToFirestore(uid, doctor)
+                }
+            }
+        }
+        
         return rowsAffected
     }
 
@@ -342,6 +383,17 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val db = writableDatabase
         val rowsDeleted = db.delete(TABLE_DOCTORS, "$COLUMN_ID = ?", arrayOf(id))
         db.close()
+        
+        // Delete from Firestore in background
+        if (rowsDeleted > 0) {
+            val uid = AuthHelper.getCurrentUser()?.uid
+            if (uid != null) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    FirestoreHelper.deleteDoctorFromFirestore(uid, id)
+                }
+            }
+        }
+        
         return rowsDeleted
     }
 
@@ -408,6 +460,18 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         
         val id = db.insert(TABLE_USER_PROFILE, null, values)
         db.close()
+        
+        // Sync to Firestore in background
+        val profile = getUserProfile()
+        if (profile != null) {
+            val uid = AuthHelper.getCurrentUser()?.uid
+            if (uid != null) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    FirestoreHelper.syncUserProfileToFirestore(uid, profile)
+                }
+            }
+        }
+        
         return id
     }
     
@@ -471,6 +535,77 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         
         db.close()
         return hasProfile
+    }
+    
+    /**
+     * Load user profile from Firestore to local database
+     * Used when app is reinstalled and local database is empty
+     * @return true if profile was loaded successfully, false otherwise
+     */
+    suspend fun loadProfileFromCloud(): Boolean {
+        val uid = AuthHelper.getCurrentUser()?.uid ?: return false
+        
+        try {
+            val cloudProfile = FirestoreHelper.loadUserProfileFromFirestore(uid)
+            
+            if (cloudProfile != null) {
+                // Save to local database
+                saveUserProfile(
+                    targetCalories = cloudProfile.targetCalories,
+                    currentWeight = cloudProfile.currentWeight,
+                    age = cloudProfile.age,
+                    gender = cloudProfile.gender,
+                    activityLevel = cloudProfile.activityLevel,
+                    dietPreference = cloudProfile.dietPreference,
+                    height = cloudProfile.height,
+                    name = cloudProfile.name,
+                    firebaseUid = cloudProfile.firebaseUid
+                )
+                return true
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        
+        return false
+    }
+    
+    /**
+     * Load doctors from Firestore to local database
+     * Used when app is reinstalled and local database is empty
+     * @return Number of doctors loaded
+     */
+    suspend fun loadDoctorsFromCloud(): Int {
+        val uid = AuthHelper.getCurrentUser()?.uid ?: return 0
+        
+        try {
+            val cloudDoctors = FirestoreHelper.loadDoctorsFromFirestore(uid)
+            
+            // Clear existing doctors first
+            deleteAllDoctors()
+            
+            // Insert each doctor (without triggering sync back to cloud)
+            val db = writableDatabase
+            var count = 0
+            
+            for (doctor in cloudDoctors) {
+                val values = ContentValues().apply {
+                    put(COLUMN_NAME, doctor.name)
+                    put(COLUMN_SPECIALTY, doctor.specialty)
+                    put(COLUMN_PHONE, doctor.phoneNumber)
+                    put(COLUMN_EMAIL, doctor.email)
+                }
+                
+                val id = db.insert(TABLE_DOCTORS, null, values)
+                if (id != -1L) count++
+            }
+            
+            db.close()
+            return count
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return 0
+        }
     }
     
     /**
